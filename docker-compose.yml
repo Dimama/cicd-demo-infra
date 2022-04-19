@@ -9,19 +9,32 @@ services:
     container_name: jenkins
     volumes:
       - $PWD/data:/var/jenkins_home
-  agent:
-    image: jenkins/ssh-agent:jdk11
-    user: root
-    container_name: agent
-    expose:
-      - 22
-    environment:
-      # paste your pubkey here
-      - JENKINS_AGENT_SSH_PUBKEY=ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCo8nPlXmyUJuoLSPBHPbpOK82KM09pssCuqI6D95t+QMLREdRtmY2D/s4dVZ14tAn0E7W3Pu9j9TwOsvBN8ngbOmRRxWn6IQnIJB3cZpowYvtW1S4pRtXeotIqvmdlLS1pL1kjdDC0JAWloATy/f5CTvLpBRORDIfcfdPvP9YeOpRQKA4UIOS+6FPfSUdIFUASaRZNpSx32i4is3Nl63J3f5JXRksL2TfOUN76iFnPdKd+GXfiM5UrF3Lp6lrhGO0x8EiXFL0D2jvnkWxThLrqOU4yNa2bfBtagnLlN8O1RToaF+W7e2oxtFYM8LNQ/4W5HZuDP3pfYSZI06BQUZ/sWVGIbcLtydEOWNPbWw3dgkQUD3vo3Jz/Cp8uVqy1fC1xMzVm0WAXsYRbGCystYMrvEBEF4JqRU+KBtgo8sGSXgwYDFhJzbqXwEudxJwtTdIBg4VI8mbMvSWX4y3+UudSjPQJl3zkDKwgBcdHD7wB4Vz0LbuurvjKeXyXyJUulaE= melnikov@CAB-WSM-0002086 
   mvn_agent:
     image: jenkins/jnlp-agent-maven:jdk11
     user: root
     container_name: mvn_agent
-    command: -url http://jenkins:8080 <secret> mvn_agent
+    command: -url http://jenkins:8080 b6225d6e9e4129d46f0de4d3916cf2b32ad492bc937ab04c1fecdcf5a5f4e0a6 mvn_agent
     volumes:
       - $PWD/mvn_agent:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+  nexus:
+    image: sonatype/nexus3
+    ports:
+      - 8081:8081
+      - 5000:5000
+    volumes:
+      - nexus-data:/nexus-data
+
+  # agent:
+  #   image: jenkins/ssh-agent:jdk11
+  #   user: root
+  #   container_name: agent
+  #   expose:
+  #     - 22
+  #   environment:
+  #     # paste your pubkey here
+  #     - JENKINS_AGENT_SSH_PUBKEY=ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCo8nPlXmyUJuoLSPBHPbpOK82KM09pssCuqI6D95t+QMLREdRtmY2D/s4dVZ14tAn0E7W3Pu9j9TwOsvBN8ngbOmRRxWn6IQnIJB3cZpowYvtW1S4pRtXeotIqvmdlLS1pL1kjdDC0JAWloATy/f5CTvLpBRORDIfcfdPvP9YeOpRQKA4UIOS+6FPfSUdIFUASaRZNpSx32i4is3Nl63J3f5JXRksL2TfOUN76iFnPdKd+GXfiM5UrF3Lp6lrhGO0x8EiXFL0D2jvnkWxThLrqOU4yNa2bfBtagnLlN8O1RToaF+W7e2oxtFYM8LNQ/4W5HZuDP3pfYSZI06BQUZ/sWVGIbcLtydEOWNPbWw3dgkQUD3vo3Jz/Cp8uVqy1fC1xMzVm0WAXsYRbGCystYMrvEBEF4JqRU+KBtgo8sGSXgwYDFhJzbqXwEudxJwtTdIBg4VI8mbMvSWX4y3+UudSjPQJl3zkDKwgBcdHD7wB4Vz0LbuurvjKeXyXyJUulaE= melnikov@CAB-WSM-0002086 
+  
+
+volumes:
+  nexus-data:
